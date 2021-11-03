@@ -1,3 +1,6 @@
+from uk_covid19 import Cov19API ## python3.9 -m pip install uk-covid19
+import json
+
 def parse_csv_data(csv_filename):
     f = open(csv_filename).read().split("\n") ## open and process file by line
     f.pop(-1) ## Remove Blank line
@@ -21,5 +24,28 @@ def process_covid_csv_data(covid_csv_data):
         last7days_cases += int(splitByCommaData[6])
     return (last7days_cases , current_hospital_cases, total_deaths)
 
-    
+def covid_API_request(location="Exeter",location_type="ltla"):
 
+    
+    filt = ['areaType='+location_type,'areaName='+location]
+
+    struc = {
+    "date": "date",
+    "areaName": "areaName",
+    "areaCode": "areaCode",
+    "newCasesByPublishDate": "newCasesByPublishDate",
+    "cumCasesByPublishDate": "cumCasesByPublishDate",
+    "newDeaths28DaysByDeathDate": "newDeaths28DaysByDeathDate",
+    "cumDeaths28DaysByDeathDate": "cumDeaths28DaysByDeathDate"
+    }
+
+    api = Cov19API(filters=filt,structure=struc,latest_by="newCasesByPublishDate")
+
+    data = api.get_json()
+
+    return data
+
+
+
+
+covid_API_request()
