@@ -1,5 +1,6 @@
 from uk_covid19 import Cov19API ## python3.9 -m pip install uk-covid19
 import json
+import sched, time
 
 def parse_csv_data(csv_filename):
     f = open(csv_filename).read().split("\n") ## open and process file by line
@@ -42,10 +43,18 @@ def covid_API_request(location="Exeter",location_type="ltla"):
     api = Cov19API(filters=filt,structure=struc,latest_by="newCasesByPublishDate")
 
     data = api.get_json()
-
+    print(data)
     return data
 
 
 
 
-covid_API_request()
+##covid_API_request()
+
+def schedule_covid_updates(update_interval,update_name):
+    s = sched.scheduler(time.time, time.sleep)
+    s.enter(update_interval,1,covid_API_request)
+    s.enter(update_interval,2,lambda : schedule_covid_updates(update_interval=update_interval,update_name=update_name))
+    s.run()
+
+schedule_covid_updates(10,"test")
