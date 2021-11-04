@@ -44,7 +44,7 @@ def covid_API_request(location="Exeter",location_type="ltla"):
 
     api = Cov19API(filters=filt,structure=struc,latest_by="newCasesByPublishDate")
 
-    data = api.get_json()
+    data = api.get_json()["data"][0]
     covid_data = data
     return data
 
