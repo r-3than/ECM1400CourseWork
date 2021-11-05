@@ -42,10 +42,8 @@ def covid_API_request(location="Exeter",location_type="ltla"):
     "cumDeaths28DaysByDeathDate": "cumDeaths28DaysByDeathDate"
     }
 
-    api = Cov19API(filters=filt,structure=struc,latest_by="newCasesByPublishDate")
-
-    data = api.get_json()["data"][0]
-    covid_data = data
+    api = Cov19API(filters=filt,structure=struc)
+    data = api.get_json()["data"][0:30]
     return data
 
 covid_data = covid_API_request()
