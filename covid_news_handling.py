@@ -2,6 +2,8 @@ from newsapi import NewsApiClient ##python3.9 -m install newsapi-python
 import json , sched ,time
 global news_articles
 global removed_articles
+global covidsched
+covidsched = sched.scheduler(time.time, time.sleep)
 removed_articles = []
 
 ## API KEY = 83888054770e425ab871a38966d67404
@@ -35,10 +37,9 @@ def update_news():
                 current_articles.remove(item)
     news_articles= current_articles
 
-def schedule_covidnews_updates(update_interval,update_name):
-    s = sched.scheduler(time.time, time.sleep)
-    s.enter(update_interval,1,update_news)
-    s.enter(update_interval,2,lambda : schedule_covidnews_updates(update_interval=update_interval,update_name=update_name))
-    s.run()
+def schedule_covidnews_updates(update_interval,update_name,repeat=False):
+    covidsched.enter(update_interval,1,update_news)
+    covidsched.enter(update_interval,2,lambda : schedule_covidnews_updates(update_interval=update_interval,update_name=update_name,repeat=repeat))
+    covidsched.run()
     
 ##schedule_covidnews_updates(100,"Test")

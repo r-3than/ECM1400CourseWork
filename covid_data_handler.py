@@ -3,6 +3,8 @@ import json
 import sched, time
 
 global covid_data
+global newssched
+newssched = sched.scheduler(time.time, time.sleep)
 
 def parse_csv_data(csv_filename):
     f = open(csv_filename).read().split("\n") ## open and process file by line
@@ -52,10 +54,9 @@ def update_covid_data():
     covid_data = covid_API_request()
 ##covid_API_request()
 
-def schedule_covid_updates(update_interval,update_name):
-    s = sched.scheduler(time.time, time.sleep)
-    s.enter(update_interval,1,covid_API_request)
-    s.enter(update_interval,2,lambda : schedule_covid_updates(update_interval=update_interval,update_name=update_name))
-    s.run()
+def schedule_covid_updates(update_interval,update_name,repeat=False):
+    newssched.enter(update_interval,1,covid_API_request)
+    if repeat : newssched.enter(update_interval,2,lambda : schedule_covid_updates(update_interval=update_interval,update_name=update_name,repeat=repeat))
+    newssched.run()
 
 ##schedule_covid_updates(10,"test")
