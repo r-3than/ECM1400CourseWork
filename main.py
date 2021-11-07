@@ -5,7 +5,8 @@ from covid_news_handling import *
 
 nation="england"
 
-
+update_covid_data()
+update_news()
 
 
 
@@ -15,8 +16,6 @@ app = Flask(__name__)
 
 @app.route("/index")
 def index():
-    update_covid_data()
-    update_news()
     newCases = 0
     for x in range(0,7):
         newCases += covid_data[x]["newCasesByPublishDate"]
@@ -26,7 +25,12 @@ def index():
     for x in range(0,7):
         nationCases += nation_data[x]["newCasesByPublishDate"]
     
-    print(request.args)
+    #print(request.args) http://127.0.0.1:5002/index?alarm=12%3A03&two=124&repeat=repeat&covid-data=covid-data&news=news
+    if "notif" in request.args:
+        remove_article(request.args["notif"])
+
+
+        
     #last7DaysInfections = int(covid_data[2]["cumCasesByPublishDate"]) - int(covid_data[8]["cumCasesByPublishDate"])
     ## Var decomp
     ## updates
