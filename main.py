@@ -1,5 +1,5 @@
 from flask import Flask, render_template ,redirect,request
-
+import datetime , threading
 from covid_data_handler import *
 from covid_news_handling import *
 global updates
@@ -30,14 +30,31 @@ def index():
         remove_article(request.args["notif"])
     if "alarm" in request.args and "two" in request.args:
         content = ""
+        currentTime = datetime.datetime.now()
+        alarmTime = request.args["alarm"].split(":")
+        wantedTime = currentTime.replace(hour=int(alarmTime[0]),minute=int(alarmTime[1]))
+        repeating = False
+        if wantedTime < currentTime:
+            wantedTime.replace(day=wantedTime.day+1)
+
+        secondsUntilUpdate = (wantedTime - currentTime).total_seconds()
+        title = request.args["two"]
+        newsupdater = threading.Thread(target= lambda : schedule_covidnews_updates(secondsUntilUpdate,title,repeat=repeating) )
+        dataupdater = threading.Thread(target= lambda : schedule_covid_updates(secondsUntilUpdate,title,repeat=repeating))
+
         if "repeat" in request.args:
             content = "Repeating "
+            repeating = True
         if "news" in request.args and "covid-data" in request.args:
             content += "update at " + request.args["alarm"] + " for news and covid data."
+            newsupdater.start()
+            dataupdater.start()
         elif "news" in request.args:
             content += "update at " + request.args["alarm"] + " for news."
+            newsupdater.start()
         elif "covid-data" in request.args:
             content += "update at " + request.args["alarm"] + " for covid data."
+            dataupdater.start()
         else:
             content += "update at " + request.args["alarm"] + " for yourself!"
 
