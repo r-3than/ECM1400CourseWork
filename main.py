@@ -66,7 +66,7 @@ def index():
     if "alarm_item" in request.args:
         for item in updates:
             if item["title"] == request.args["alarm_item"]:
-                updates.remove(item)
+                updates.remove(item) #todo remove the scheduled update. this just removes the notifcation. 
     #last7DaysInfections = int(covid_data[2]["cumCasesByPublishDate"]) - int(covid_data[8]["cumCasesByPublishDate"])
     ## Var decomp
     ## updates
@@ -78,7 +78,9 @@ def index():
     ## hospital_cases
     ## deaths_total
     ## news_articles
-    ##notification
+    ## notification
+    ## favicon
+    ## image
     return render_template("index.html",updates=updates,local_7day_infections=newCases,nation_location=nation_data[0]["areaName"],national_7day_infections=nationCases,title="Hello World!",location=covid_data[0]["areaName"],news_articles=news_articles,notification={'title':'Test'})
 
 
