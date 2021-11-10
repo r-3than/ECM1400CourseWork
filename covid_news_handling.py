@@ -39,7 +39,7 @@ def update_news():
 
 def schedule_covidnews_updates(update_interval,update_name,repeat=False):
     covidsched.enter(update_interval,1,update_news)
-    if repeat : covidsched.enter(update_interval,2,lambda : schedule_covidnews_updates(update_interval=update_interval,update_name=update_name,repeat=repeat))
+    if repeat : covidsched.enter(update_interval,2,lambda : schedule_covidnews_updates(update_interval=24*60*60,update_name=update_name,repeat=repeat))
     covidsched.run()
     
 ##schedule_covidnews_updates(100,"Test")
