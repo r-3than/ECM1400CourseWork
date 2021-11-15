@@ -6,10 +6,9 @@ global covidsched
 covidsched = sched.scheduler(time.time, time.sleep)
 removed_articles = []
 
-## API KEY = 83888054770e425ab871a38966d67404
-# another key = 5c0596d695d94557afe21ab112411dcd
+
 def news_API_request(covid_terms="Covid COVID-19 coronavirus"):
-    newsapi = NewsApiClient(api_key='5c0596d695d94557afe21ab112411dcd')
+    newsapi = NewsApiClient(api_key=open("apikey.txt").read())
     terms = covid_terms.split(" ")
     all_articles = []
     for term in terms:
