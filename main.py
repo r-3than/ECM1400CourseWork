@@ -1,4 +1,4 @@
-from flask import Flask, render_template ,redirect,request
+from flask import Flask, render_template,request
 import datetime , threading
 from covid_data_handler import *
 from covid_news_handling import *
@@ -39,14 +39,17 @@ def index():
 
         secondsUntilUpdate = (wantedTime - currentTime).total_seconds()
         title = request.args["two"]
-        newsupdater = threading.Thread(target= lambda : schedule_covidnews_updates(secondsUntilUpdate,title,repeat=repeating) )
-        dataupdater = threading.Thread(target= lambda : schedule_covid_updates(secondsUntilUpdate,title,repeat=repeating))
+        
 
         if "repeat" in request.args:
             content = "Repeating "
             repeating = True
+
+        newsupdater = threading.Thread(target= lambda : schedule_covidnews_updates(secondsUntilUpdate,title,repeat=repeating) )
+        dataupdater = threading.Thread(target= lambda : schedule_covid_updates(secondsUntilUpdate,title,repeat=repeating))
         if "news" in request.args and "covid-data" in request.args:
             content += "update at " + request.args["alarm"] + " for news and covid data."
+
             newsupdater.start()
             dataupdater.start()
         elif "news" in request.args:
@@ -60,13 +63,13 @@ def index():
 
             
 
-        update = {"title":request.args["two"],"content":content}
+        update = {"title":request.args["two"],"content":content,}
         updates.append(update)
 
     if "alarm_item" in request.args:
         for item in updates:
             if item["title"] == request.args["alarm_item"]:
-                updates.remove(item) #todo remove the scheduled update. this just removes the notifcation. 
+                updates.remove(item) #todo remove the scheduled update. this just removes the notifcation 
     #last7DaysInfections = int(covid_data[2]["cumCasesByPublishDate"]) - int(covid_data[8]["cumCasesByPublishDate"])
     ## Var decomp
     ## updates
@@ -81,7 +84,14 @@ def index():
     ## notification
     ## favicon
     ## image
-    return render_template("index.html",updates=updates,local_7day_infections=newCases,nation_location=nation_data[0]["areaName"],national_7day_infections=nationCases,title="Hello World!",location=covid_data[0]["areaName"],news_articles=news_articles,notification={'title':'Test'})
+    return render_template(
+    "index.html",
+    updates=updates,
+    deaths_total=nation_data[1]["cumDeaths28DaysByDeathDate"],
+    local_7day_infections=newCases,nation_location=nation_data[0]["areaName"],
+    national_7day_infections=nationCases,title="Hello World!",
+    location=covid_data[0]["areaName"],
+    news_articles=news_articles,notification={'title':'Test'})
 
-
-app.run(port=5002,debug=True)
+if __name__ == "__main__":
+    app.run(port=5002,debug=True)
