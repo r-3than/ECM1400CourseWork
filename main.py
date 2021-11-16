@@ -2,6 +2,7 @@ from flask import Flask, render_template,request
 import datetime , threading
 from covid_data_handler import *
 from covid_news_handling import *
+from schedHandler import schedHandler
 global updates
 nation="england"
 
@@ -9,6 +10,9 @@ update_covid_data()
 update_news()
 
 updates = []
+
+newsHandler = schedHandler(newssched)
+covidHandler = schedHandler(covidsched)
 
 app = Flask(__name__)
 
@@ -33,47 +37,49 @@ def index():
         currentTime = datetime.datetime.now()
         alarmTime = request.args["alarm"].split(":")
         wantedTime = currentTime.replace(hour=int(alarmTime[0]),minute=int(alarmTime[1]))
-        repeating = False
+        
         if wantedTime < currentTime:
             wantedTime.replace(day=wantedTime.day+1)
 
         secondsUntilUpdate = (wantedTime - currentTime).total_seconds()
         title = request.args["two"]
         
-
+        repeating = False
         if "repeat" in request.args:
             content = "repeating "
             repeating = True
-
-        newsupdater = threading.Thread(target= lambda : schedule_covidnews_updates(secondsUntilUpdate,title,repeat=repeating) )
-        dataupdater = threading.Thread(target= lambda : schedule_covid_updates(secondsUntilUpdate,title,repeat=repeating))
-        if "news" in request.args and "covid-data" in request.args:
-            content += "update at " + request.args["alarm"] + " for news and covid data."
-
-            newsupdater.start()
-            dataupdater.start()
-        elif "news" in request.args:
-            content += "update at " + request.args["alarm"] + " for news."
-            newsupdater.start()
-        elif "covid-data" in request.args:
-            content += "update at " + request.args["alarm"] + " for covid data."
-            dataupdater.start()
-        else:
-            content += "update at " + request.args["alarm"] + " for yourself!"
-
-        content = list(content)
-        content[0] = content[0].upper()
-        content = str(content)
-
-
-
-        update = {"title":request.args["two"],"content":content,}
-        updates.append(update)
+        if "news" in request.args:
+            newscontent = content + "update at " + request.args["alarm"] + " for news."
+            newscontent = list(newscontent)
+            newscontent[0] = newscontent[0].upper()
+            newscontent = ''.join(newscontent)
+            newsHandler.addEvent(update_news,secondsUntilUpdate,"News Data Update:"+request.args["two"],newscontent,repeat=repeating)
+        if "covid-data" in request.args:
+            datacontent = content + "update at " + request.args["alarm"] + " for covid data."
+            datacontent = list(datacontent)
+            datacontent[0] = datacontent[0].upper()
+            datacontent = ''.join(datacontent)
+            covidHandler.addEvent(update_news,secondsUntilUpdate,"Covid Data Update:"+request.args["two"],datacontent,repeat=repeating)
 
     if "alarm_item" in request.args:
+
+        updates = covidHandler.getEvents()
         for item in updates:
             if item["title"] == request.args["alarm_item"]:
-                updates.remove(item) #todo remove the scheduled update. this just removes the notifcation 
+                queueEvents = item["events"]
+                for e in queueEvents:
+                    covidHandler.removeEvent(e)
+
+        updates = newsHandler.getEvents()
+        for item in updates:
+            if item["title"] == request.args["alarm_item"]:
+                queueEvents = item["events"]
+                for e in queueEvents:
+                    newsHandler.removeEvent(e)
+                
+
+        
+
     #last7DaysInfections = int(covid_data[2]["cumCasesByPublishDate"]) - int(covid_data[8]["cumCasesByPublishDate"])
     ## Var decomp
     ## updates
@@ -88,6 +94,10 @@ def index():
     ## notification
     ## favicon
     ## image
+    updates = []
+    updates += covidHandler.getEvents()
+    updates += newsHandler.getEvents()
+
     return render_template(
     "index.html",
     updates=updates,
