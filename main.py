@@ -42,7 +42,7 @@ def index():
         
 
         if "repeat" in request.args:
-            content = "Repeating "
+            content = "repeating "
             repeating = True
 
         newsupdater = threading.Thread(target= lambda : schedule_covidnews_updates(secondsUntilUpdate,title,repeat=repeating) )
@@ -61,7 +61,11 @@ def index():
         else:
             content += "update at " + request.args["alarm"] + " for yourself!"
 
-            
+        content = list(content)
+        content[0] = content[0].upper()
+        content = str(content)
+
+
 
         update = {"title":request.args["two"],"content":content,}
         updates.append(update)
