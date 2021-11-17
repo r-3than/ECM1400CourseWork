@@ -105,7 +105,8 @@ def index():
     local_7day_infections=newCases,nation_location=nation_data[0]["areaName"],
     national_7day_infections=nationCases,title="Hello World!",
     location=covid_data[0]["areaName"],
-    news_articles=news_articles,notification={'title':'Test'})
+    news_articles=news_articles,notification={'title':'Test'},
+    image="covidimage.jpg",)
 
 if __name__ == "__main__":
     app.run(port=5002,debug=True)
