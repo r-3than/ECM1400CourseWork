@@ -48,6 +48,20 @@ def covid_API_request(location="Exeter",location_type="ltla"):
     data = api.get_json()["data"][0:30]
     return data
 
+def get_hospital_cases(location="england",location_type="nation"):
+    filt = ['areaType='+location_type,'areaName='+location]
+    struc = {
+    "date": "date",
+    "areaName": "areaName",
+    "areaCode": "areaCode",
+    "hospitalCases" : "hospitalCases"
+    }
+
+    api = Cov19API(filters=filt,structure=struc)
+    temp = api.get_json()["data"][0:30]
+    return temp[1]["hospitalCases"]
+
+
 covid_data = covid_API_request()
 
 def update_covid_data():
