@@ -7,7 +7,7 @@ covidsched = sched.scheduler(time.time, time.sleep)
 removed_articles = []
 
 
-def news_API_request(covid_terms="Covid COVID-19 coronavirus"):
+def news_API_request(covid_terms=json.loads(open("config.json").read())["news_terms"]):
     newsapi = NewsApiClient(api_key=open("apikey.txt").read())
     terms = covid_terms.split(" ")
     all_articles = []
@@ -28,7 +28,7 @@ def remove_article(title):
     
 
 
-def update_news(*info):
+def update_news():
     current_articles = news_API_request()
     for item in current_articles:
         for removed in removed_articles:

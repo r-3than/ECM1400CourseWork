@@ -1,10 +1,12 @@
 from flask import Flask, render_template,request
-import datetime , threading
+import datetime  ,json
 from covid_data_handler import *
 from covid_news_handling import *
 from schedHandler import schedHandler
 global updates
-nation="england"
+
+global nation
+nation=json.loads(open("config.json").read())["nation"]
 
 update_covid_data()
 update_news()
@@ -24,7 +26,7 @@ def index():
     for x in range(0,7):
         newCases += covid_data[x]["newCasesByPublishDate"]
         
-    nation_data = covid_API_request("england","nation")
+    nation_data = covid_API_request(nation,"nation")
     nationCases = 0
     for x in range(0,7):
         nationCases += nation_data[x]["newCasesByPublishDate"]

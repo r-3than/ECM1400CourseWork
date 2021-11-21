@@ -29,7 +29,7 @@ def process_covid_csv_data(covid_csv_data):
         last7days_cases += int(splitByCommaData[6])
     return (last7days_cases , current_hospital_cases, total_deaths)
 
-def covid_API_request(location="Exeter",location_type="ltla"):
+def covid_API_request(location=json.loads(open("config.json").read())["location"],location_type=json.loads(open("config.json").read())["location_type"]):
 
     
     filt = ['areaType='+location_type,'areaName='+location]
@@ -48,7 +48,7 @@ def covid_API_request(location="Exeter",location_type="ltla"):
     data = api.get_json()["data"][0:30]
     return data
 
-def get_hospital_cases(location="england",location_type="nation"):
+def get_hospital_cases(location=json.loads(open("config.json").read())["nation"],location_type="nation"):
     filt = ['areaType='+location_type,'areaName='+location]
     struc = {
     "date": "date",
