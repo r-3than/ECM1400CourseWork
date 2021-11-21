@@ -44,7 +44,8 @@ def index():
             wantedTime.replace(day=wantedTime.day+1)
 
         secondsUntilUpdate = (wantedTime - currentTime).total_seconds()
-        title = request.args["two"]
+        #title = request.args["two"]
+        
         
         repeating = False
         if "repeat" in request.args:
@@ -55,13 +56,34 @@ def index():
             newscontent = list(newscontent)
             newscontent[0] = newscontent[0].upper()
             newscontent = ''.join(newscontent)
-            newsHandler.addEvent(update_news,secondsUntilUpdate,"News Data Update:"+request.args["two"],newscontent,repeat=repeating)
+            title = "News Data Update:"+request.args["two"]+ " "
+            events = newsHandler.events
+            no_doubles = False
+            while no_doubles == False:
+                no_doubles = True
+                for item in events:
+                    eventTitle = item["title"]
+                    if title == eventTitle:
+                        title += "I"
+                        no_doubles = False
+            newsHandler.addEvent(update_news,secondsUntilUpdate,title,newscontent,repeat=repeating)
         if "covid-data" in request.args:
+            
             datacontent = content + "update at " + request.args["alarm"] + " for covid data."
             datacontent = list(datacontent)
             datacontent[0] = datacontent[0].upper()
             datacontent = ''.join(datacontent)
-            covidHandler.addEvent(update_news,secondsUntilUpdate,"Covid Data Update:"+request.args["two"],datacontent,repeat=repeating)
+            title = "Covid Data Update:"+request.args["two"]+ " "
+            events = covidHandler.events
+            no_doubles = False
+            while no_doubles == False:
+                no_doubles = True
+                for item in events:
+                    eventTitle = item["title"]
+                    if title == eventTitle:
+                        title += "I"
+                        no_doubles = False
+            covidHandler.addEvent(update_news,secondsUntilUpdate,title,datacontent,repeat=repeating)
 
     if "alarm_item" in request.args:
 
