@@ -59,7 +59,7 @@ def get_hospital_cases(location=json.loads(open("config.json").read())["nation"]
 
     api = Cov19API(filters=filt,structure=struc)
     temp = api.get_json()["data"][0:30]
-    return temp[1]["hospitalCases"]
+    return temp[0]["hospitalCases"]
 
 
 covid_data = covid_API_request()
