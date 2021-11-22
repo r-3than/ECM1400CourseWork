@@ -35,6 +35,7 @@ class schedHandler:
     def runSched(self):
         if not self.isRunning:
             self.isRunning = True
+            self.workerThread = threading.Thread(target=self.__workSched)
             self.workerThread.start()
     def __workSched(self):
         self.schObj.run()
