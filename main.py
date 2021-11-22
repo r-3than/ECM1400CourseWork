@@ -34,10 +34,10 @@ def index():
     #print(request.args) http://127.0.0.1:5002/index?alarm=12%3A03&two=124&repeat=repeat&covid-data=covid-data&news=news
     if "notif" in request.args:
         remove_article(request.args["notif"])
-    if "alarm" in request.args and "two" in request.args:
+    if "update" in request.args and "two" in request.args:
         content = ""
         currentTime = datetime.datetime.now()
-        alarmTime = request.args["alarm"].split(":")
+        alarmTime = request.args["update"].split(":")
         wantedTime = currentTime.replace(hour=int(alarmTime[0]),minute=int(alarmTime[1]))
         
         if wantedTime < currentTime:
@@ -52,7 +52,7 @@ def index():
             content = "repeating "
             repeating = True
         if "news" in request.args:
-            newscontent = content + "update at " + request.args["alarm"] + " for news."
+            newscontent = content + "update at " + request.args["update"] + " for news."
             newscontent = list(newscontent)
             newscontent[0] = newscontent[0].upper()
             newscontent = ''.join(newscontent)
@@ -69,7 +69,7 @@ def index():
             newsHandler.addEvent(update_news,secondsUntilUpdate,title,newscontent,repeat=repeating)
         if "covid-data" in request.args:
             
-            datacontent = content + "update at " + request.args["alarm"] + " for covid data."
+            datacontent = content + "update at " + request.args["update"] + " for covid data."
             datacontent = list(datacontent)
             datacontent[0] = datacontent[0].upper()
             datacontent = ''.join(datacontent)
@@ -85,18 +85,18 @@ def index():
                         no_doubles = False
             covidHandler.addEvent(update_news,secondsUntilUpdate,title,datacontent,repeat=repeating)
 
-    if "alarm_item" in request.args:
+    if "update_item" in request.args:
 
         updates = covidHandler.getEvents()
         for item in updates:
-            if item["title"] == request.args["alarm_item"]:
+            if item["title"] == request.args["update_item"]:
                 queueEvents = item["events"]
                 for e in queueEvents:
                     covidHandler.removeEvent(e)
 
         updates = newsHandler.getEvents()
         for item in updates:
-            if item["title"] == request.args["alarm_item"]:
+            if item["title"] == request.args["update_item"]:
                 queueEvents = item["events"]
                 for e in queueEvents:
                     newsHandler.removeEvent(e)
@@ -129,7 +129,7 @@ def index():
     local_7day_infections=newCases,nation_location=nation_data[0]["areaName"],
     national_7day_infections=nationCases,title="Hello World!",
     location=covid_data[0]["areaName"],
-    news_articles=news_articles,notification={'title':'Test'},
+    news_articles=news_articles,
     image="covidimage.jpg",
     hospital_cases=get_hospital_cases())
 
