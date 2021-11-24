@@ -6,6 +6,10 @@ from schedHandler import schedHandler
 global updates
 
 global nation
+
+
+### Follow the google style doc strings
+
 nation=json.loads(open("config.json").read())["nation"]
 
 update_covid_data()
