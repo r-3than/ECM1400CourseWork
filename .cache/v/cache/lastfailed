@@ -1,0 +1,5 @@
+{
+  "test_cases.py": true, 
+  "tests/test_covid_data_handler.py": true, 
+  "tests/test_news_data_handling.py": true
+}
