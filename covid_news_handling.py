@@ -1,3 +1,13 @@
+"""
+
+This module covid_news_handling handles news updates.
+It serves to:
+    Request fresh news data.
+    Remove articles
+    Schedule news updates. 
+
+"""
+
 from newsapi import NewsApiClient ##python3.9 -m install newsapi-python
 import json , sched ,time
 global news_articles
@@ -8,6 +18,19 @@ removed_articles = []
 
 
 def news_API_request(covid_terms=json.loads(open("config.json").read())["news_terms"]):
+    """news_API_request function
+
+    This function takes in covid_terms and returns a list of dictionaries of news articles with those terms.
+
+    Args:
+        covid_terms (string): A string with terms seperated by a white space to search for news articles for.
+
+    Returns:
+        list: Returns a list of news articles.
+        e.g [{article1},{article2},{article3},... etc ]
+
+    """
+
     newsapi = NewsApiClient(api_key=open("apikey.txt").read())
     terms = covid_terms.split(" ")
     all_articles = []
@@ -19,6 +42,17 @@ def news_API_request(covid_terms=json.loads(open("config.json").read())["news_te
 news_articles=news_API_request()
 
 def remove_article(title):
+    """remove_article function
+
+    This function takes in a title of an article and removes it form the current list of shown articles.
+    It will also save the title of the article to an array so in future updates they will not show
+
+    Args:
+        title (string) : The title of an article.
+
+    Returns:
+        None
+    """
     removed_articles.append(title)
     for item in news_articles:
         for removed in removed_articles:
@@ -29,6 +63,20 @@ def remove_article(title):
 
 
 def update_news():
+    """update_news function
+
+    This function takes in no arguments but instead fetches an updated news
+    and removes any unwanted articles from the list removed_articles and will
+    set global var news_articles to these fetched articles.
+
+    Args:
+        None
+
+    Returns:
+        None: However global var news_articles is updated.
+
+
+    """
     current_articles = news_API_request()
     for item in current_articles:
         for removed in removed_articles:
@@ -37,6 +85,19 @@ def update_news():
     news_articles= current_articles
 
 def schedule_covidnews_updates(update_interval,update_name,repeat=False):
+    """schedule_covidnews_updates function
+
+    This function is a secheduler function which serves add an update to news on a scheduler.
+
+    Args:
+        update_interval (int): Number of seconds until and updates should be processed. 
+        update_name (string): The name of the scheduler to help identify them
+        repeat (bool): A default bool of False set to true to schedule an update at this time every day.
+
+    Returns:
+        None
+
+    """
     covidsched.enter(update_interval,1,update_news)
     if repeat : covidsched.enter(update_interval,2,schedule_covidnews_updates,argument=(24*60*60,update_name,repeat))
     covidsched.run()
