@@ -39,6 +39,7 @@ def index():
         A rendered template hosted at localhost:5002/index
 
     """
+    logging.info("localhost:5002/index has been requested")
     newCases = 0
     for x in range(0,7):
         newCases += covid_data[x]["newCasesByPublishDate"]
@@ -146,7 +147,7 @@ def index():
     local_7day_infections=newCases,nation_location=nation_data[0]["areaName"],
     national_7day_infections=nationCases,title="Hello World!",
     location=covid_data[0]["areaName"],
-    news_articles=news_articles,
+    news_articles=news_articles[0:5], ## limited to 6 items
     image="covidimage.jpg",
     hospital_cases=get_hospital_cases())
 
