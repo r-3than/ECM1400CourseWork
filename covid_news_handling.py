@@ -4,12 +4,15 @@ This module covid_news_handling handles news updates.
 It serves to:
     Request fresh news data.
     Remove articles
-    Schedule news updates. 
+    Schedule news updates.
 
 """
 
-from newsapi import NewsApiClient ##python3.9 -m install newsapi-python
-import json , sched ,time , logging
+from newsapi import NewsApiClient  # python3.9 -m install newsapi-python
+import json
+import sched
+import time
+import logging
 global news_articles
 global removed_articles
 global covidsched
@@ -17,7 +20,8 @@ covidsched = sched.scheduler(time.time, time.sleep)
 removed_articles = []
 
 
-def news_API_request(covid_terms=json.loads(open("config.json").read())["news_terms"]):
+def news_API_request(covid_terms=json.loads(
+        open("config.json").read())["news_terms"]):
     """news_API_request function
 
     This function takes in covid_terms and returns a list of dictionaries of news articles with those terms.
@@ -33,18 +37,22 @@ def news_API_request(covid_terms=json.loads(open("config.json").read())["news_te
     try:
         logging.info("Trying to fetch data with apikey")
         newsapi = NewsApiClient(api_key=open("apikey.txt").read())
-    
+
         terms = covid_terms.split(" ")
         all_articles = []
         for term in terms:
             some_articles = newsapi.get_everything(q=term)["articles"]
             all_articles += some_articles
+        for article in all_articles:
+            article["content"] = article["content"][:-14]
         return all_articles
-    except:
+    except BaseException:
         logging.warning("INVAILD API KEY PLEASE CHANGE IN apikey.txt")
         return []
 
-news_articles=news_API_request()
+
+news_articles = news_API_request()
+
 
 def remove_article(title):
     """remove_article function
@@ -64,11 +72,10 @@ def remove_article(title):
         for removed in removed_articles:
             if item["title"] == removed:
                 news_articles.remove(item)
-                
-    
 
 
-def update_news(covid_terms=json.loads(open("config.json").read())["news_terms"]):
+def update_news(covid_terms=json.loads(
+        open("config.json").read())["news_terms"]):
     """update_news function
 
     This function takes in covid_terms and fetches an updated news
@@ -89,15 +96,16 @@ def update_news(covid_terms=json.loads(open("config.json").read())["news_terms"]
         for removed in removed_articles:
             if item == removed:
                 current_articles.remove(item)
-    news_articles= current_articles
+    news_articles = current_articles
 
-def schedule_covidnews_updates(update_interval,update_name,repeat=False):
+
+def schedule_covidnews_updates(update_interval, update_name, repeat=False):
     """schedule_covidnews_updates function
 
     This function is a secheduler function which serves add an update to news on a scheduler.
 
     Args:
-        update_interval (int): Number of seconds until and updates should be processed. 
+        update_interval (int): Number of seconds until and updates should be processed.
         update_name (string): The name of the scheduler to help identify them
         repeat (bool): A default bool of False set to true to schedule an update at this time every day.
 
@@ -105,9 +113,17 @@ def schedule_covidnews_updates(update_interval,update_name,repeat=False):
         None
 
     """
-    logging.info("News will be updated in "+update_interval+" seconds.")
-    covidsched.enter(update_interval,1,update_news)
-    if repeat : covidsched.enter(update_interval,2,schedule_covidnews_updates,argument=(24*60*60,update_name,repeat))
+    logging.info("News will be updated in " + update_interval + " seconds.")
+    covidsched.enter(update_interval, 1, update_news)
+    if repeat:
+        covidsched.enter(
+            update_interval,
+            2,
+            schedule_covidnews_updates,
+            argument=(
+                24 * 60 * 60,
+                update_name,
+                repeat))
     covidsched.run()
-    
-##schedule_covidnews_updates(100,"Test")
+
+# schedule_covidnews_updates(100,"Test")

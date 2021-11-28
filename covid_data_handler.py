@@ -1,10 +1,13 @@
-from uk_covid19 import Cov19API ## python3.9 -m pip install uk-covid19
+from uk_covid19 import Cov19API  # python3.9 -m pip install uk-covid19
 import json
-import sched, time,logging
+import sched
+import time
+import logging
 
 global covid_data
 global newssched
 newssched = sched.scheduler(time.time, time.sleep)
+
 
 def parse_csv_data(csv_filename):
     """parse_csv_data function
@@ -20,9 +23,10 @@ def parse_csv_data(csv_filename):
 
     """
     logging.info("Parsing csv data")
-    f = open(csv_filename).read().split("\n") ## open and process file by line
-    f.pop(-1) ## Remove Blank line
+    f = open(csv_filename).read().split("\n")  # open and process file by line
+    f.pop(-1)  # Remove Blank line
     return f
+
 
 def process_covid_csv_data(covid_csv_data):
     """process_covid_csv_data Function
@@ -42,29 +46,39 @@ def process_covid_csv_data(covid_csv_data):
     """
     logging.info("Processing covid data.")
     logging.info("Fields calculated:")
-    last7days_cases = 0 ## Thecases in the last 7 days should be calculated by summing the new cases by specemin date forthe last 7 days ignoring the first entry as the data is incomplete for that day
-    current_hospital_cases = int(covid_csv_data[1].split(",")[5]) ##top row of current cases.
-    logging.info("  current_hospital_cases :"+current_hospital_cases)
+    last7days_cases = 0  # Thecases in the last 7 days should be calculated by summing the new cases by specemin date forthe last 7 days ignoring the first entry as the data is incomplete for that day
+    # top row of current cases.
+    current_hospital_cases = int(covid_csv_data[1].split(",")[5])
+    logging.info("  current_hospital_cases :" + current_hospital_cases)
     total_deaths = 0
     specimanDataLn = None
-    for x in range(1,len(covid_csv_data)-1): ## for general case of finding location of speciman date
+    for x in range(
+            1,
+            len(covid_csv_data) -
+            1):  # for general case of finding location of speciman date
         splitByCommaData = covid_csv_data[x].split(",")
-        if splitByCommaData[6].isnumeric() and specimanDataLn == None: ## index 6 is where speciman data is kept & is numeric checks for number input
-            specimanDataLn = x+1 ## start counting from next line
+        # index 6 is where speciman data is kept & is numeric checks for number
+        # input
+        if splitByCommaData[6].isnumeric() and specimanDataLn is None:
+            specimanDataLn = x + 1  # start counting from next line
         if splitByCommaData[4].isnumeric() and total_deaths == 0:
             total_deaths = int(splitByCommaData[4])
-        if specimanDataLn != None and total_deaths != 0: break
-    logging.info("  total_deaths :"+total_deaths)
-    for x in range(specimanDataLn,specimanDataLn+7):
+        if specimanDataLn is not None and total_deaths != 0:
+            break
+    logging.info("  total_deaths :" + total_deaths)
+    for x in range(specimanDataLn, specimanDataLn + 7):
         splitByCommaData = covid_csv_data[x].split(",")
         last7days_cases += int(splitByCommaData[6])
 
-    logging.info("  last7days_cases :"+last7days_cases)
-    
-    
-    return (last7days_cases , current_hospital_cases, total_deaths)
+    logging.info("  last7days_cases :" + last7days_cases)
 
-def covid_API_request(location=json.loads(open("config.json").read())["location"],location_type=json.loads(open("config.json").read())["location_type"]):
+    return (last7days_cases, current_hospital_cases, total_deaths)
+
+
+def covid_API_request(
+    location=json.loads(
+        open("config.json").read())["location"], location_type=json.loads(
+            open("config.json").read())["location_type"]):
     """covid_API_request function
 
     This function takes in a location and location type and requests
@@ -93,30 +107,34 @@ def covid_API_request(location=json.loads(open("config.json").read())["location"
 
     """
 
-    filt = ['areaType='+location_type,'areaName='+location]
+    filt = ['areaType=' + location_type, 'areaName=' + location]
 
     struc = {
-    "date": "date",
-    "areaName": "areaName",
-    "areaCode": "areaCode",
-    "newCasesByPublishDate": "newCasesByPublishDate",
-    "cumCasesByPublishDate": "cumCasesByPublishDate",
-    "newDeaths28DaysByDeathDate": "newDeaths28DaysByDeathDate",
-    "cumDeaths28DaysByDeathDate": "cumDeaths28DaysByDeathDate"
+        "date": "date",
+        "areaName": "areaName",
+        "areaCode": "areaCode",
+        "newCasesByPublishDate": "newCasesByPublishDate",
+        "cumCasesByPublishDate": "cumCasesByPublishDate",
+        "newDeaths28DaysByDeathDate": "newDeaths28DaysByDeathDate",
+        "cumDeaths28DaysByDeathDate": "cumDeaths28DaysByDeathDate"
     }
 
-    api = Cov19API(filters=filt,structure=struc)
+    api = Cov19API(filters=filt, structure=struc)
     data = api.get_json()["data"][0:30]
     return data
 
-def get_hospital_cases(location=json.loads(open("config.json").read())["nation"],location_type="nation"):
+
+def get_hospital_cases(
+        location=json.loads(
+            open("config.json").read())["nation"],
+        location_type="nation"):
     """get_hospital_cases Function
 
     This function takes the location and location_type
 
     Args:
        location (string): Location must conform with the uk-covid data API and location_type var. More info here : (https://coronavirus.data.gov.uk/details/developers-guide/main-api)
-        location_type (string): Please note that the values of the location_type variable are case-sensitive 
+        location_type (string): Please note that the values of the location_type variable are case-sensitive
         Unlike covid_API_request hospital cases data field only is provided in these 3 fields and they can only be used:
             overview
                 Overview data for the United Kingdom
@@ -130,21 +148,26 @@ def get_hospital_cases(location=json.loads(open("config.json").read())["nation"]
 
 
     """
-    filt = ['areaType='+location_type,'areaName='+location]
+    filt = ['areaType=' + location_type, 'areaName=' + location]
     struc = {
-    "date": "date",
-    "areaName": "areaName",
-    "areaCode": "areaCode",
-    "hospitalCases" : "hospitalCases"
+        "date": "date",
+        "areaName": "areaName",
+        "areaCode": "areaCode",
+        "hospitalCases": "hospitalCases"
     }
     logging.info("Getting hospital cases from:" + location)
-    api = Cov19API(filters=filt,structure=struc)
+    api = Cov19API(filters=filt, structure=struc)
     temp = api.get_json()["data"][0:30]
-    logging.info("Latest entry is from:" + temp[0]["date"] + ". With "+str(temp[0]["hospitalCases"]) + " hospital cases.")
+    logging.info("Latest entry is from:" +
+                 temp[0]["date"] +
+                 ". With " +
+                 str(temp[0]["hospitalCases"]) +
+                 " hospital cases.")
     return temp[0]["hospitalCases"]
 
 
 covid_data = covid_API_request()
+
 
 def update_covid_data():
     """get_hospital_cases Function
@@ -160,15 +183,16 @@ def update_covid_data():
     """
     logging.info("Trying to update covid data!")
     covid_data = covid_API_request()
-##covid_API_request()
+# covid_API_request()
 
-def schedule_covid_updates(update_interval,update_name,repeat=False):
+
+def schedule_covid_updates(update_interval, update_name, repeat=False):
     """schedule_covid_updates function
 
     This function is a secheduler function which serves add an update covid data on a scheduler.
 
     Args:
-        update_interval (int): Number of seconds until and updates should be processed. 
+        update_interval (int): Number of seconds until and updates should be processed.
         update_name (string): The name of the scheduler to help identify them
         repeat (bool): A default bool of False set to true to schedule an update at this time every day.
 
@@ -176,9 +200,19 @@ def schedule_covid_updates(update_interval,update_name,repeat=False):
         None
 
     """
-    logging.info("Covid data will be updated in "+update_interval+" seconds.")
-    newssched.enter(update_interval,1,covid_API_request)
-    if repeat : newssched.enter(update_interval,2,lambda : schedule_covid_updates(update_interval=24*60*60,update_name=update_name,repeat=repeat))
+    logging.info(
+        "Covid data will be updated in " +
+        update_interval +
+        " seconds.")
+    newssched.enter(update_interval, 1, covid_API_request)
+    if repeat:
+        newssched.enter(
+            update_interval,
+            2,
+            lambda: schedule_covid_updates(
+                update_interval=24 * 60 * 60,
+                update_name=update_name,
+                repeat=repeat))
     newssched.run()
 
-##schedule_covid_updates(10,"test")
+# schedule_covid_updates(10,"test")
