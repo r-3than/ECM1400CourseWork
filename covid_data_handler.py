@@ -1,3 +1,13 @@
+"""
+
+This module covid_data_handler handles data updates.
+It serves to:
+    Request fresh covid data.
+    Format data to be representable.
+    Schedule covid data updates.
+
+"""
+
 from uk_covid19 import Cov19API  # python3.9 -m pip install uk-covid19
 import json
 import sched

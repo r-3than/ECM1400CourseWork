@@ -1,3 +1,13 @@
+"""
+
+This module schedHandler contains a schedHandler object which:
+    Handles scheduler objects.
+    Adding new events onto the scheduler.
+    Removing already queued events on the scheduler.
+    Hosts the schedule object on a seperate thread to avoid main.py waiting on the scheduler.
+
+"""
+
 import threading
 import logging
 
