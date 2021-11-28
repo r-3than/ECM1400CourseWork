@@ -26,6 +26,14 @@ app = Flask(__name__)
 
 @app.route("/index")
 def index():
+    """
+    This is the main function that handles
+    the flask connection between the api and the client.
+
+    Returns:
+        A rendered template hosted at localhost:5002/index
+
+    """
     newCases = 0
     for x in range(0,7):
         newCases += covid_data[x]["newCasesByPublishDate"]

@@ -7,11 +7,38 @@ global newssched
 newssched = sched.scheduler(time.time, time.sleep)
 
 def parse_csv_data(csv_filename):
+    """parse_csv_data function
+
+    This function takes in a csv file and formates it correctly from the spec.
+
+    Args:
+        csv_filename (string) : Path to csv file with name e.g "~/Documents/mycoviddata.csv"
+
+    Returns:
+        list: Lines of the csv.
+
+
+    """
     f = open(csv_filename).read().split("\n") ## open and process file by line
     f.pop(-1) ## Remove Blank line
     return f
 
 def process_covid_csv_data(covid_csv_data):
+    """process_covid_csv_data Function
+
+    This function takes in covid_csv_data and calculates 3 fields:
+        - Cumulative new cases over seven days.
+        - Current hospital cases (Those in hostipal due to covid)
+        - Total deaths (in the data parsed)
+
+    Args:
+        covid_csv_data (list) : Formated csv_data by line
+
+    Returns:
+        tuple: A tuple containing 3 data entrys, last seven day cases, current hosptital cases and total deaths. (In that order)
+
+
+    """
     last7days_cases = 0 ## Thecases in the last 7 days should be calculated by summing the new cases by specemin date forthe last 7 days ignoring the first entry as the data is incomplete for that day
     current_hospital_cases = int(covid_csv_data[1].split(",")[5]) ##top row of current cases.
     total_deaths = 0
@@ -30,7 +57,33 @@ def process_covid_csv_data(covid_csv_data):
     return (last7days_cases , current_hospital_cases, total_deaths)
 
 def covid_API_request(location=json.loads(open("config.json").read())["location"],location_type=json.loads(open("config.json").read())["location_type"]):
+    """covid_API_request function
 
+    This function takes in a location and location type and requests
+    to the UK covid API for covid data about that region.
+    -- Please note that depending on location type different kinds of data may / may not be available for use
+
+    Args:
+        location (string): Location must conform with the uk-covid data API and location_type var. More info here : (https://coronavirus.data.gov.uk/details/developers-guide/main-api)
+        location_type (string): Please note that the values of the location_type variable are case-sensitive and must follow:
+            overview
+                Overview data for the United Kingdom
+            nation
+                Nation data (England, Northern Ireland, Scotland, and Wales)
+            region
+                Region data
+            nhsRegion
+                NHS Region data
+            utla
+                Upper-tier local authority data
+            ltla
+                Lower-tier local authority data
+
+    Returns:
+        list : a list of vaild & formated covid data entries from the covid api data from the uk gov.
+
+
+    """
     
     filt = ['areaType='+location_type,'areaName='+location]
 
@@ -49,6 +102,26 @@ def covid_API_request(location=json.loads(open("config.json").read())["location"
     return data
 
 def get_hospital_cases(location=json.loads(open("config.json").read())["nation"],location_type="nation"):
+    """get_hospital_cases Function
+
+    This function takes the location and location_type
+
+    Args:
+       location (string): Location must conform with the uk-covid data API and location_type var. More info here : (https://coronavirus.data.gov.uk/details/developers-guide/main-api)
+        location_type (string): Please note that the values of the location_type variable are case-sensitive 
+        Unlike covid_API_request hospital cases data field only is provided in these 3 fields and they can only be used:
+            overview
+                Overview data for the United Kingdom
+            nation
+                Nation data (England, Northern Ireland, Scotland, and Wales)
+            nhsRegion
+                NHS Region data
+
+    Returns:
+        int: and integer value representing the most upto date data field containing hospital cases.
+
+
+    """
     filt = ['areaType='+location_type,'areaName='+location]
     struc = {
     "date": "date",
@@ -65,10 +138,34 @@ def get_hospital_cases(location=json.loads(open("config.json").read())["nation"]
 covid_data = covid_API_request()
 
 def update_covid_data():
+    """get_hospital_cases Function
+
+    This function is used to update covid_data globally as a proxy for a scheduler.
+
+    Args:
+        None:
+
+    Returns:
+        None: (However updates covid_data)
+
+    """
     covid_data = covid_API_request()
 ##covid_API_request()
 
 def schedule_covid_updates(update_interval,update_name,repeat=False):
+    """schedule_covid_updates function
+
+    This function is a secheduler function which serves add an update covid data on a scheduler.
+
+    Args:
+        update_interval (int): Number of seconds until and updates should be processed. 
+        update_name (string): The name of the scheduler to help identify them
+        repeat (bool): A default bool of False set to true to schedule an update at this time every day.
+
+    Returns:
+        None
+
+    """
     newssched.enter(update_interval,1,covid_API_request)
     if repeat : newssched.enter(update_interval,2,lambda : schedule_covid_updates(update_interval=24*60*60,update_name=update_name,repeat=repeat))
     newssched.run()

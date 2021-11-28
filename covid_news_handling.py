@@ -62,10 +62,10 @@ def remove_article(title):
     
 
 
-def update_news():
+def update_news(covid_terms=json.loads(open("config.json").read())["news_terms"]):
     """update_news function
 
-    This function takes in no arguments but instead fetches an updated news
+    This function takes in covid_terms and fetches an updated news
     and removes any unwanted articles from the list removed_articles and will
     set global var news_articles to these fetched articles.
 
@@ -77,7 +77,7 @@ def update_news():
 
 
     """
-    current_articles = news_API_request()
+    current_articles = news_API_request(covid_terms=covid_terms)
     for item in current_articles:
         for removed in removed_articles:
             if item == removed:
