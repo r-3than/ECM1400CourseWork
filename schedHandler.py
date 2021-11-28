@@ -1,4 +1,4 @@
-import threading
+import threading,logging
 class schedHandler:
     """The schedHandler, handles schedular objects so that updates are formated correctly.
     It provides to:
@@ -9,6 +9,7 @@ class schedHandler:
 
     """
     def __init__(self,schObj):
+        
         """schedHandler __init__ method
 
         Args:
@@ -25,8 +26,9 @@ class schedHandler:
             workerThread (threading.Thread object): The refrence to the worker thread.
             events (list of dictiontaries): holding info about events and data pointers
         """
+        logging.info("A schedHandler has been created!")
     def addEvent(self,event,update_interval,update_name,info,*args,**kwargs):
-         """addEvent method
+        """addEvent method
 
         Adds events onto the scheduler and handles them for the user.
 
@@ -47,9 +49,9 @@ class schedHandler:
                 events.append(repeater)
         
         info = {"content":info,"title":update_name,"events":events}
-
+        
         self.schObj.enter(update_interval,3,self.__cleanup,argument=(info,))
-
+        logging.info("Event has been added to the scheduler!")
         self.events.append(info)
         self.runSched()
     def __cleanup(self,info):
@@ -57,6 +59,7 @@ class schedHandler:
             if info == item:
                 self.events.remove(item)
     def getEvents(self):
+        logging.info("Event list has been requested!")
         """getEvents method
 
         Returns:
@@ -75,17 +78,23 @@ class schedHandler:
         for item in self.events:
             if e in item["events"]:
                 self.events.remove(item)
+                logging.info("Event has been removed.")
         self.schObj.cancel(e)
+
     def runSched(self):
         """runSched method
 
         Is run whenever a new event is on the sched, if the worker thread is still running the sched no need to change anything
         If the worker thread is finished create a new one to run the sched.  
         """
+        logging.info("Checking if the scheduler is running")
         if not self.isRunning:
+            logging.info("Scheduler is not running workerThread starting....")
             self.isRunning = True
             self.workerThread = threading.Thread(target=self.__workSched)
             self.workerThread.start()
     def __workSched(self):
+        logging.info("Worker thread started on the schedule!")
         self.schObj.run()
         self.isRunning=False
+        logging.info("Worker thread finished and ready to be reused.")

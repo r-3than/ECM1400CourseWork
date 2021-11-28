@@ -9,7 +9,7 @@ It serves to:
 """
 
 from newsapi import NewsApiClient ##python3.9 -m install newsapi-python
-import json , sched ,time
+import json , sched ,time , logging
 global news_articles
 global removed_articles
 global covidsched
@@ -30,14 +30,19 @@ def news_API_request(covid_terms=json.loads(open("config.json").read())["news_te
         e.g [{article1},{article2},{article3},... etc ]
 
     """
-
-    newsapi = NewsApiClient(api_key=open("apikey.txt").read())
-    terms = covid_terms.split(" ")
-    all_articles = []
-    for term in terms:
-        some_articles = newsapi.get_everything(q=term)["articles"]
-        all_articles += some_articles
-    return all_articles
+    try:
+        logging.info("Trying to fetch data with apikey")
+        newsapi = NewsApiClient(api_key=open("apikey.txt").read())
+    
+        terms = covid_terms.split(" ")
+        all_articles = []
+        for term in terms:
+            some_articles = newsapi.get_everything(q=term)["articles"]
+            all_articles += some_articles
+        return all_articles
+    except:
+        logging.warning("INVAILD API KEY PLEASE CHANGE IN apikey.txt")
+        return []
 
 news_articles=news_API_request()
 
@@ -53,6 +58,7 @@ def remove_article(title):
     Returns:
         None
     """
+    logging.info("Removing article -" + title + "-.")
     removed_articles.append(title)
     for item in news_articles:
         for removed in removed_articles:
@@ -77,6 +83,7 @@ def update_news(covid_terms=json.loads(open("config.json").read())["news_terms"]
 
 
     """
+    logging.info("Updating articles")
     current_articles = news_API_request(covid_terms=covid_terms)
     for item in current_articles:
         for removed in removed_articles:
@@ -98,6 +105,7 @@ def schedule_covidnews_updates(update_interval,update_name,repeat=False):
         None
 
     """
+    logging.info("News will be updated in "+update_interval+" seconds.")
     covidsched.enter(update_interval,1,update_news)
     if repeat : covidsched.enter(update_interval,2,schedule_covidnews_updates,argument=(24*60*60,update_name,repeat))
     covidsched.run()

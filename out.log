@@ -1,0 +1,36 @@
+11/28/2021 05:19:25 PM Trying to fetch data with apikey
+11/28/2021 05:19:27 PM Imports successfully imported with no errors.
+11/28/2021 05:19:27 PM Trying to update covid data!
+11/28/2021 05:19:27 PM Updating articles
+11/28/2021 05:19:27 PM Trying to fetch data with apikey
+11/28/2021 05:19:29 PM A schedHandler has been created!
+11/28/2021 05:19:29 PM A schedHandler has been created!
+11/28/2021 05:19:29 PM  * Running on http://127.0.0.1:5002/ (Press CTRL+C to quit)
+11/28/2021 05:19:29 PM  * Restarting with stat
+11/28/2021 05:19:29 PM Trying to fetch data with apikey
+11/28/2021 05:19:30 PM Imports successfully imported with no errors.
+11/28/2021 05:19:30 PM Trying to update covid data!
+11/28/2021 05:19:30 PM Updating articles
+11/28/2021 05:19:30 PM Trying to fetch data with apikey
+11/28/2021 05:19:31 PM A schedHandler has been created!
+11/28/2021 05:19:31 PM A schedHandler has been created!
+11/28/2021 05:19:31 PM  * Debugger is active!
+11/28/2021 05:19:31 PM  * Debugger PIN: 727-874-799
+11/28/2021 05:20:04 PM Event list has been requested!
+11/28/2021 05:20:04 PM Event list has been requested!
+11/28/2021 05:20:04 PM Getting hospital cases from:england
+11/28/2021 05:20:04 PM Latest entry is from:2021-11-26. With 5992 hospital cases.
+11/28/2021 05:20:04 PM 127.0.0.1 - - [28/Nov/2021 17:20:04] "GET /index HTTP/1.1" 200 -
+11/28/2021 05:20:04 PM 127.0.0.1 - - [28/Nov/2021 17:20:04] "[36mGET /static/images/covidimage.jpg HTTP/1.1[0m" 304 -
+11/28/2021 05:21:05 PM Event list has been requested!
+11/28/2021 05:21:05 PM Event list has been requested!
+11/28/2021 05:21:05 PM Getting hospital cases from:england
+11/28/2021 05:21:05 PM Latest entry is from:2021-11-26. With 5992 hospital cases.
+11/28/2021 05:21:05 PM 127.0.0.1 - - [28/Nov/2021 17:21:05] "GET /index HTTP/1.1" 200 -
+11/28/2021 05:21:05 PM 127.0.0.1 - - [28/Nov/2021 17:21:05] "[36mGET /static/images/covidimage.jpg HTTP/1.1[0m" 304 -
+11/28/2021 05:22:06 PM Event list has been requested!
+11/28/2021 05:22:06 PM Event list has been requested!
+11/28/2021 05:22:06 PM Getting hospital cases from:england
+11/28/2021 05:22:06 PM Latest entry is from:2021-11-26. With 5992 hospital cases.
+11/28/2021 05:22:06 PM 127.0.0.1 - - [28/Nov/2021 17:22:06] "GET /index HTTP/1.1" 200 -
+11/28/2021 05:22:06 PM 127.0.0.1 - - [28/Nov/2021 17:22:06] "[36mGET /static/images/covidimage.jpg HTTP/1.1[0m" 304 -

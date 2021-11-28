@@ -1,10 +1,15 @@
+import logging
+logging.basicConfig(filename='out.log', level=logging.INFO,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 from flask import Flask, render_template,request
 import datetime  ,json
 from covid_data_handler import *
 from covid_news_handling import *
 from schedHandler import schedHandler
-global updates
 
+
+logging.info('Imports successfully imported with no errors.')
+
+global updates
 global nation
 
 
