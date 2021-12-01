@@ -66,7 +66,7 @@ def remove_article(title):
     Returns:
         None
     """
-    logging.info("Removing article -" + title + "-.")
+    logging.info("Removing article -" + str(title) + "-.")
     removed_articles.append(title)
     for item in news_articles:
         for removed in removed_articles:
@@ -113,7 +113,7 @@ def schedule_covidnews_updates(update_interval, update_name, repeat=False):
         None
 
     """
-    logging.info("News will be updated in " + update_interval + " seconds.")
+    logging.info("News will be updated in " + str(update_interval) + " seconds.")
     covidsched.enter(update_interval, 1, update_news)
     if repeat:
         covidsched.enter(

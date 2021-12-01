@@ -59,7 +59,7 @@ def process_covid_csv_data(covid_csv_data):
     last7days_cases = 0  # Thecases in the last 7 days should be calculated by summing the new cases by specemin date forthe last 7 days ignoring the first entry as the data is incomplete for that day
     # top row of current cases.
     current_hospital_cases = int(covid_csv_data[1].split(",")[5])
-    logging.info("  current_hospital_cases :" + current_hospital_cases)
+    logging.info("  current_hospital_cases :" + str(current_hospital_cases))
     total_deaths = 0
     specimanDataLn = None
     for x in range(
@@ -75,12 +75,12 @@ def process_covid_csv_data(covid_csv_data):
             total_deaths = int(splitByCommaData[4])
         if specimanDataLn is not None and total_deaths != 0:
             break
-    logging.info("  total_deaths :" + total_deaths)
+    logging.info("  total_deaths :" + str(total_deaths))
     for x in range(specimanDataLn, specimanDataLn + 7):
         splitByCommaData = covid_csv_data[x].split(",")
         last7days_cases += int(splitByCommaData[6])
 
-    logging.info("  last7days_cases :" + last7days_cases)
+    logging.info("  last7days_cases :" + str(last7days_cases))
 
     return (last7days_cases, current_hospital_cases, total_deaths)
 
@@ -131,7 +131,7 @@ def covid_API_request(
 
     api = Cov19API(filters=filt, structure=struc)
     data = api.get_json()["data"][0:30]
-    return data
+    return {"covidData":data}
 
 
 def get_hospital_cases(
@@ -165,7 +165,7 @@ def get_hospital_cases(
         "areaCode": "areaCode",
         "hospitalCases": "hospitalCases"
     }
-    logging.info("Getting hospital cases from:" + location)
+    logging.info("Getting hospital cases from:" + str(location))
     api = Cov19API(filters=filt, structure=struc)
     temp = api.get_json()["data"][0:30]
     logging.info("Latest entry is from:" +
@@ -176,7 +176,7 @@ def get_hospital_cases(
     return temp[0]["hospitalCases"]
 
 
-covid_data = covid_API_request()
+covid_data = covid_API_request()["covidData"]
 
 
 def update_covid_data():
@@ -192,7 +192,7 @@ def update_covid_data():
 
     """
     logging.info("Trying to update covid data!")
-    covid_data = covid_API_request()
+    covid_data = covid_API_request()["covidData"]
 # covid_API_request()
 
 
@@ -212,7 +212,7 @@ def schedule_covid_updates(update_interval, update_name, repeat=False):
     """
     logging.info(
         "Covid data will be updated in " +
-        update_interval +
+        str(update_interval) +
         " seconds.")
     newssched.enter(update_interval, 1, covid_API_request)
     if repeat:

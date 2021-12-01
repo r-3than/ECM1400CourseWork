@@ -1,3 +1,14 @@
+"""
+
+This module main.py handles the flask connection and serves the webpage to the user.
+It serves to:
+    Handle displaying data to the user.
+    Handle removing news articles.
+    Handle adding updates to data or news.
+    Handle removing unwanted updates.
+
+"""
+
 import json
 import datetime
 from schedHandler import schedHandler
@@ -48,7 +59,7 @@ def index():
     for x in range(0, 7):
         newCases += covid_data[x]["newCasesByPublishDate"]
 
-    nation_data = covid_API_request(nation, "nation")
+    nation_data = covid_API_request(nation, "nation")["covidData"]
     nationCases = 0
     for x in range(0, 7):
         nationCases += nation_data[x]["newCasesByPublishDate"]
@@ -161,7 +172,7 @@ def index():
         updates=updates,
         deaths_total=nation_data[1]["cumDeaths28DaysByDeathDate"],
         local_7day_infections=newCases, nation_location=nation_data[0]["areaName"],
-        national_7day_infections=nationCases, title="Hello World!",
+        national_7day_infections=nationCases, title="Covid Dashboard.",
         location=covid_data[0]["areaName"],
         news_articles=news_articles[0:5],  # limited to 6 items
         image="covidimage.jpg",
@@ -169,4 +180,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(port=5002, debug=True)
+    app.run(port=5000, debug=True)
