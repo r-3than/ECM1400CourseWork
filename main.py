@@ -11,10 +11,12 @@ It serves to:
 
 import json
 import datetime
+
+from werkzeug.utils import redirect
 from schedHandler import schedHandler
 from covid_news_handling import *
 from covid_data_handler import *
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request , Markup
 import logging
 logging.basicConfig(
     filename='out.log',
@@ -167,16 +169,20 @@ def index():
     updates += covidHandler.getEvents()
     updates += newsHandler.getEvents()
 
+    deaths_total = "Total deaths in " +json.loads(open("config.json").read())["nation"].title() + ": "+ str(nation_data[1]["cumDeaths28DaysByDeathDate"])
+    hospital_cases = "Total hospital cases in " +json.loads(open("config.json").read())["nation"].title() + ": "+ str(get_hospital_cases())
     return render_template(
         "index.html",
         updates=updates,
-        deaths_total=nation_data[1]["cumDeaths28DaysByDeathDate"],
+        deaths_total=deaths_total,
         local_7day_infections=newCases, nation_location=nation_data[0]["areaName"],
         national_7day_infections=nationCases, title="Covid Dashboard.",
         location=covid_data[0]["areaName"],
         news_articles=news_articles[0:5],  # limited to 6 items
         image="covidimage.jpg",
-        hospital_cases=get_hospital_cases())
+        hospital_cases=hospital_cases)
+
+
 
 
 if __name__ == "__main__":

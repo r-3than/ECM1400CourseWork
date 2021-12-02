@@ -10,6 +10,7 @@ It serves to:
 
 from newsapi import NewsApiClient  # python3.9 -m install newsapi-python
 import json
+from flask import Markup
 import sched
 import time
 import logging
@@ -44,7 +45,8 @@ def news_API_request(covid_terms=json.loads(
             some_articles = newsapi.get_everything(q=term)["articles"]
             all_articles += some_articles
         for article in all_articles:
-            article["content"] = article["content"][:-14]
+            article["content"] = article["content"][:-17] + "<a href={}>...</a>".format(article["url"])
+            article["content"] = Markup(article["content"])
         return all_articles
     except BaseException:
         logging.warning("INVAILD API KEY PLEASE CHANGE IN apikey.txt")
