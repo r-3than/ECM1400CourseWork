@@ -48,9 +48,12 @@ app = Flask(__name__)
 
 @app.route("/index")
 def index():
-    """
+    """Main function
+
     This is the main function that handles
     the flask connection between the api and the client.
+    It uses the imported modules to serve the data to the user
+    in a nice GUI.
 
     Returns:
         A rendered template hosted at localhost:5002/index
