@@ -12,7 +12,6 @@ It serves to:
 import json
 import datetime
 
-from werkzeug.utils import redirect
 from schedHandler import schedHandler
 from covid_news_handling import *
 from covid_data_handler import *
