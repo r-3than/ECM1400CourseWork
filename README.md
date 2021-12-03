@@ -40,7 +40,7 @@ With venvs:
     ```
 ## Usage
 
-With venv(linux - Ubuntu(debian))
+With venv(linux - Ubuntu(debian)):
     ```sh 
     ./start.sh
     ```
@@ -48,21 +48,21 @@ With venv(linux - Ubuntu(debian))
     Go to localhost:5000/index
     ```
 
-With venv(Windows - powershell)
+With venv(Windows - powershell):
     ```sh
-     .\WindowsVenv\Scripts\Activate.ps1
-     ```
+    .\WindowsVenv\Scripts\Activate.ps1
+    ```
     ```
     sh python main.py
     ```
     ```sh
      Go to localhost:5000/index
-     ```
+    ```
 
-With venv(Windows - cmd)
+With venv(Windows - cmd):
     ```sh
-     .\WindowsVenv\Scripts\activate.bat
-     ```
+    .\WindowsVenv\Scripts\activate.bat
+    ```
     ```sh
      python main.py
      ```
