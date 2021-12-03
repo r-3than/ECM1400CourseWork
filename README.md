@@ -27,48 +27,48 @@ Without venvs:
     ```sh 
     pip3 install newsapi-python
     ```
-    ```
-    sh python3 main.py
+    ```sh
+    python3 main.py
     ```
     ```sh 
     Go to localhost:5000/index
     ```
 
 With venvs:
-    ```sh 
+
     Make sure python 3.9 + is installed
-    ```
+
 ## Usage
 
 With venv(linux - Ubuntu(debian)):
-    ```sh 
+    ``` 
     ./start.sh
     ```
-    ```sh 
+    ``` 
     Go to localhost:5000/index
     ```
 
 With venv(Windows - powershell):
-    ```sh
+    ```
     .\WindowsVenv\Scripts\Activate.ps1
     ```
     ```
-    sh python main.py
+    python main.py
     ```
-    ```sh
+    ```
      Go to localhost:5000/index
     ```
 
 With venv(Windows - cmd):
-    ```sh
+    ```
     .\WindowsVenv\Scripts\activate.bat
     ```
-    ```sh
-     python main.py
-     ```
-    ```sh
-     Go to localhost:5000/index
-     ```
+    ```
+    python main.py
+    ```
+    ```
+    Go to localhost:5000/index
+    ```
 ## Contributors
 
 Ethan Ray (r-3than)
