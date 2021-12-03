@@ -48,9 +48,12 @@ def news_API_request(covid_terms=json.loads(
             article["content"] = article["content"][:-17] + "<a href={}>...</a>".format(article["url"])
             article["content"] = Markup(article["content"])
         return all_articles
-    except BaseException:
+    except:
         logging.warning("INVAILD API KEY PLEASE CHANGE IN apikey.txt")
-        return []
+        content = "You have not changed the apikey in apikey.txt. Get an api key <a href={}>here</a>".format("https://newsapi.org/register")
+        content = Markup(content)
+        warningArticle = {"title":"INVAILD API KEY", "content":content}
+        return [warningArticle]
 
 
 news_articles = news_API_request()
