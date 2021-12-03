@@ -16,35 +16,34 @@ These are the requirements:
 
 ## Installation / Getting Started
 
-First get an api from [here](https://newsapi.org/register)
-Then put this apikey into apikey.txt.
+1. First get an api from [here](https://newsapi.org/register)
+2. Then put this apikey into apikey.txt.
+3. Then install python3.9 +
+4. You can either install the modules or use the virtual environments to run the project:
+__
+Without venvs:__
+    ```sh pip3 install uk-covid19```
+    ```sh pip3 install newsapi-python```
+    ```sh python3 main.py```
+    ```sh Go to localhost:5000/index```
 
-Then install python3.9 +
-You can either install the modules or use the virtual environments to run the project:
-
-Without venvs:
-    pip3 install uk-covid19
-    pip3 install newsapi-python
-    python3 main.py
-    Go to localhost:5000/index
-
-With venvs:
-    Make sure python 3.9 + is installed
+With venvs:__
+    ```sh Make sure python 3.9 + is installed```
 ## Usage
 
-With venv(linux - Ubuntu(debian)):
-    ./start.sh
-    Go to localhost:5000/index
+With venv(linux - Ubuntu(debian)):__
+    ```sh ./start.sh```
+    ```sh Go to localhost:5000/index```
 
-With venv(Windows - powershell):
-    .\WindowsVenv\Scripts\Activate.ps1
-    python main.py
-    Go to localhost:5000/index
+With venv(Windows - powershell):__
+    ```sh .\WindowsVenv\Scripts\Activate.ps1```
+    ```sh python main.py```
+    ```sh Go to localhost:5000/index```
 
-With venv(Windows - cmd):
-    .\WindowsVenv\Scripts\activate.bat
-    python main.py
-    Go to localhost:5000/index
+With venv(Windows - cmd):__
+    ```sh .\WindowsVenv\Scripts\activate.bat```
+    ```sh python main.py```
+    ```sh Go to localhost:5000/index```
 ## Contributors
 
 Ethan Ray (r-3than)
