@@ -19,7 +19,7 @@ global newssched
 newssched = sched.scheduler(time.time, time.sleep)
 
 
-def parse_csv_data(csv_filename):
+def parse_csv_data(csv_filename:str) -> list:
     """parse_csv_data function
 
     This function takes in a csv file and formates it correctly from the spec.
@@ -38,7 +38,7 @@ def parse_csv_data(csv_filename):
     return f
 
 
-def process_covid_csv_data(covid_csv_data):
+def process_covid_csv_data(covid_csv_data:list) -> tuple:
     """process_covid_csv_data Function
 
     This function takes in covid_csv_data and calculates 3 fields:
@@ -86,9 +86,8 @@ def process_covid_csv_data(covid_csv_data):
 
 
 def covid_API_request(
-    location=json.loads(
-        open("config.json").read())["location"], location_type=json.loads(
-            open("config.json").read())["location_type"]):
+    location:str=json.loads(open("config.json").read())["location"],
+    location_type:str=json.loads(open("config.json").read())["location_type"]) -> dict:
     """covid_API_request function
 
     This function takes in a location and location type and requests
@@ -112,7 +111,7 @@ def covid_API_request(
                 Lower-tier local authority data
 
     Returns:
-        list : a list of vaild & formated covid data entries from the covid api data from the uk gov.
+        dict : a dict of lists of vaild & formated covid data entries from the covid api data from the uk gov.
 
 
     """
@@ -135,9 +134,8 @@ def covid_API_request(
 
 
 def get_hospital_cases(
-        location=json.loads(
-            open("config.json").read())["nation"],
-        location_type="nation"):
+        location:str=json.loads(open("config.json").read())["nation"],
+        location_type:str="nation")-> int:
     """get_hospital_cases Function
 
     This function takes the location and location_type
@@ -179,7 +177,7 @@ def get_hospital_cases(
 covid_data = covid_API_request()["covidData"]
 
 
-def update_covid_data():
+def update_covid_data() -> None:
     """get_hospital_cases Function
 
     This function is used to update covid_data globally as a proxy for a scheduler.
@@ -196,7 +194,7 @@ def update_covid_data():
 # covid_API_request()
 
 
-def schedule_covid_updates(update_interval, update_name, repeat=False):
+def schedule_covid_updates(update_interval:int, update_name:str, repeat:bool=False) -> None:
     """schedule_covid_updates function
 
     This function is a secheduler function which serves add an update covid data on a scheduler.

@@ -22,7 +22,7 @@ class schedHandler:
 
     """
 
-    def __init__(self, schObj):
+    def __init__(self, schObj : object) -> None:
         """schedHandler __init__ method
 
         Args:
@@ -43,12 +43,12 @@ class schedHandler:
 
     def addEvent(
             self,
-            event,
-            update_interval,
-            update_name,
-            info,
+            event : object,
+            update_interval : int,
+            update_name : str,
+            info : str,
             *args,
-            **kwargs):
+            **kwargs) -> None:
         """addEvent method
 
         Adds events onto the scheduler and handles them for the user.
@@ -78,12 +78,12 @@ class schedHandler:
         self.events.append(info)
         self.runSched()
 
-    def __cleanup(self, info):
+    def __cleanup(self, info : dict) -> None:
         for item in self.events:
             if info == item:
                 self.events.remove(item)
 
-    def getEvents(self):
+    def getEvents(self) -> list:
         logging.info("Event list has been requested!")
         """getEvents method
 
@@ -92,8 +92,8 @@ class schedHandler:
         """
         return self.events
 
-    def removeEvent(self, e):
-        """removeEVent method
+    def removeEvent(self, e : tuple) -> None:
+        """removeEvent method
 
         Removes event via the event data refrence (this is unique and hence is why it is used)
 
@@ -107,7 +107,7 @@ class schedHandler:
                 logging.info("Event has been removed.")
         self.schObj.cancel(e)
 
-    def runSched(self):
+    def runSched(self) -> None:
         """runSched method
 
         Is run whenever a new event is on the sched, if the worker thread is still running the sched no need to change anything
@@ -120,7 +120,7 @@ class schedHandler:
             self.workerThread = threading.Thread(target=self.__workSched)
             self.workerThread.start()
 
-    def __workSched(self):
+    def __workSched(self) -> None:
         logging.info("Worker thread started on the schedule!")
         self.schObj.run()
         self.isRunning = False
