@@ -21,8 +21,8 @@ covidsched = sched.scheduler(time.time, time.sleep)
 removed_articles = []
 
 
-def news_API_request(covid_terms=json.loads(
-        open("config.json").read())["news_terms"]):
+def news_API_request(covid_terms:dict=json.loads(
+        open("config.json").read())["news_terms"]) -> list:
     """news_API_request function
 
     This function takes in covid_terms and returns a list of dictionaries of news articles with those terms.
@@ -59,7 +59,7 @@ def news_API_request(covid_terms=json.loads(
 news_articles = news_API_request()
 
 
-def remove_article(title):
+def remove_article(title:str) -> None:
     """remove_article function
 
     This function takes in a title of an article and removes it form the current list of shown articles.
@@ -79,8 +79,8 @@ def remove_article(title):
                 news_articles.remove(item)
 
 
-def update_news(covid_terms=json.loads(
-        open("config.json").read())["news_terms"]):
+def update_news(covid_terms:str=json.loads(
+        open("config.json").read())["news_terms"]) -> None:
     """update_news function
 
     This function takes in covid_terms and fetches an updated news
@@ -88,7 +88,7 @@ def update_news(covid_terms=json.loads(
     set global var news_articles to these fetched articles.
 
     Args:
-        None
+        str : covid_terms a string seperated by white space for terms to get form the api.
 
     Returns:
         None: However global var news_articles is updated.
@@ -104,7 +104,7 @@ def update_news(covid_terms=json.loads(
     news_articles = current_articles
 
 
-def schedule_covidnews_updates(update_interval, update_name, repeat=False):
+def schedule_covidnews_updates(update_interval:int, update_name:str, repeat:bool=False)-> None:
     """schedule_covidnews_updates function
 
     This function is a secheduler function which serves add an update to news on a scheduler.
