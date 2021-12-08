@@ -62,10 +62,7 @@ def process_covid_csv_data(covid_csv_data:list) -> tuple:
     logging.info("  current_hospital_cases :" + str(current_hospital_cases))
     total_deaths = 0
     specimanDataLn = None
-    for x in range(
-            1,
-            len(covid_csv_data) -
-            1):  # for general case of finding location of speciman date
+    for x in range(1,len(covid_csv_data) -1):  # for general case of finding location of speciman date
         splitByCommaData = covid_csv_data[x].split(",")
         # index 6 is where speciman data is kept & is numeric checks for number
         # input
