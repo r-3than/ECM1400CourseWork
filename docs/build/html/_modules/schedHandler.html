@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schedHandler &#8212; ECM1400CovidDashboard 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for schedHandler</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">This module schedHandler contains a schedHandler object which:</span>
+<span class="sd">    Handles scheduler objects.</span>
+<span class="sd">    Adding new events onto the scheduler.</span>
+<span class="sd">    Removing already queued events on the scheduler.</span>
+<span class="sd">    Hosts the schedule object on a seperate thread to avoid main.py waiting on the scheduler.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="schedHandler"><a class="viewcode-back" href="../schedHandler.html#schedHandler.schedHandler">[docs]</a><span class="k">class</span> <span class="nc">schedHandler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The schedHandler, handles schedular objects so that updates are formated correctly.</span>
+<span class="sd">    It provides to:</span>
+<span class="sd">        Repeat updates if required.</span>
+<span class="sd">        Remove updates and scheduled events.</span>
+<span class="sd">        Remove updates once completed</span>
+<span class="sd">        Handle the sched on another thread to not interupt the flask api.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schObj</span> <span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;schedHandler __init__ method</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            schObj (sched.scheduler object): A scheduler object to host events on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schObj</span> <span class="o">=</span> <span class="n">schObj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workerThread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__workSched</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attributes:</span>
+<span class="sd">            schObj (sched.scheduler object): The parsed scheduler to handle.</span>
+<span class="sd">            isRunning (bool): A boolean depicting if the workerThread is still running.</span>
+<span class="sd">            workerThread (threading.Thread object): The refrence to the worker thread.</span>
+<span class="sd">            events (list of dictiontaries): holding info about events and data pointers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A schedHandler has been created!&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="schedHandler.addEvent"><a class="viewcode-back" href="../schedHandler.html#schedHandler.schedHandler.addEvent">[docs]</a>    <span class="k">def</span> <span class="nf">addEvent</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">event</span> <span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+            <span class="n">update_interval</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">update_name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">info</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;addEvent method</span>
+
+<span class="sd">        Adds events onto the scheduler and handles them for the user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (function) : The event that should be run after the update_interval</span>
+<span class="sd">            update_interval (int): Number of seconds until and updates should be processed.</span>
+<span class="sd">            update_name (string): The name of the scheduler to help identify them</span>
+<span class="sd">            repeat (bool): A default bool of False set to true to schedule an update at this time every day.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">repeater</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+        <span class="n">main</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schObj</span><span class="o">.</span><span class="n">enter</span><span class="p">(</span><span class="n">update_interval</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">argument</span><span class="o">=</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="p">[</span><span class="n">main</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;repeat&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;repeat&quot;</span><span class="p">]:</span>
+                <span class="n">repeater</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schObj</span><span class="o">.</span><span class="n">enter</span><span class="p">(</span>
+                    <span class="n">update_interval</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">addEvent</span><span class="p">,</span> <span class="n">argument</span><span class="o">=</span><span class="p">(</span>
+                        <span class="n">event</span><span class="p">,</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span> <span class="n">update_name</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">args</span><span class="p">,),</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">repeater</span><span class="p">)</span>
+
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">info</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">update_name</span><span class="p">,</span> <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="n">events</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">schObj</span><span class="o">.</span><span class="n">enter</span><span class="p">(</span><span class="n">update_interval</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cleanup</span><span class="p">,</span> <span class="n">argument</span><span class="o">=</span><span class="p">(</span><span class="n">info</span><span class="p">,))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Event has been added to the scheduler!&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runSched</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">info</span> <span class="o">==</span> <span class="n">item</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+<div class="viewcode-block" id="schedHandler.getEvents"><a class="viewcode-back" href="../schedHandler.html#schedHandler.schedHandler.getEvents">[docs]</a>    <span class="k">def</span> <span class="nf">getEvents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Event list has been requested!&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;getEvents method</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (list of dictionaries): holding info about events and data pointers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span></div>
+
+<div class="viewcode-block" id="schedHandler.removeEvent"><a class="viewcode-back" href="../schedHandler.html#schedHandler.schedHandler.removeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">removeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span> <span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;removeEvent method</span>
+
+<span class="sd">        Removes event via the event data refrence (this is unique and hence is why it is used)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            e (event dict) : The event that should be run after the update_interval</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;events&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Event has been removed.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schObj</span><span class="o">.</span><span class="n">cancel</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="schedHandler.runSched"><a class="viewcode-back" href="../schedHandler.html#schedHandler.schedHandler.runSched">[docs]</a>    <span class="k">def</span> <span class="nf">runSched</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;runSched method</span>
+
+<span class="sd">        Is run whenever a new event is on the sched, if the worker thread is still running the sched no need to change anything</span>
+<span class="sd">        If the worker thread is finished create a new one to run the sched.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Checking if the scheduler is running&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Scheduler is not running workerThread starting....&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">workerThread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__workSched</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">workerThread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__workSched</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Worker thread started on the schedule!&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schObj</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Worker thread finished and ready to be reused.&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">ECM1400CovidDashboard</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Ethan Ray (r-3than).
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
