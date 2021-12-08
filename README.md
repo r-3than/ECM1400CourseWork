@@ -2,6 +2,8 @@
 
 This is the covid 19 dashboard for ECM1400. It is 100% of the assessment and needs to follow the [spec](https://github.com/r-3than/ECM1400CourseWork/blob/13ffd0a71cb45845f973258022094663d4f85d0d/CA-specification.pdf) provided.
 
+You can also read the docs find at ./docs/build/html/ or [here](https://github.com/r-3than/ECM1400CourseWork/tree/main/docs/build/html)
+
 ## Features or examples
 
 Here is what the dashboard looks like:
