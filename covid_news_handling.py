@@ -21,7 +21,7 @@ covidsched = sched.scheduler(time.time, time.sleep)
 removed_articles = []
 
 
-def news_API_request(covid_terms:dict=json.loads(
+def news_API_request(covid_terms:str=json.loads(
         open("config.json").read())["news_terms"]) -> list:
     """news_API_request function
 

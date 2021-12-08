@@ -17,8 +17,13 @@ from covid_news_handling import *
 from covid_data_handler import *
 from flask import Flask, render_template, request , Markup
 import logging
+
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
 logging.basicConfig(
     filename='out.log',
+    filemode="w+",
     level=logging.INFO,
     format='%(asctime)s %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -58,7 +63,7 @@ def index():
         A rendered template hosted at localhost:5002/index
 
     """
-    logging.info("localhost:5002/index has been requested")
+    logging.info("localhost:5000/index has been requested")
     newCases = 0
     for x in range(0, 7):
         newCases += covid_data[x]["newCasesByPublishDate"]
@@ -188,4 +193,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    app.run(port=5000, debug=True)
