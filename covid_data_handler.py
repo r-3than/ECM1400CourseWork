@@ -14,6 +14,7 @@ import sched
 import time
 import logging
 
+global nation_data
 global covid_data
 global newssched
 newssched = sched.scheduler(time.time, time.sleep)
@@ -85,6 +86,7 @@ def process_covid_csv_data(covid_csv_data:list) -> tuple:
 def covid_API_request(
     location:str=json.loads(open("config.json").read())["location"],
     location_type:str=json.loads(open("config.json").read())["location_type"]) -> dict:
+    logging.info("Fetching covid data from gov api.")
     """covid_API_request function
 
     This function takes in a location and location type and requests
@@ -172,9 +174,12 @@ def get_hospital_cases(
 
 
 covid_data = covid_API_request()["covidData"]
+nation = json.loads(open("config.json").read())["nation"]
+nation_data = covid_API_request(nation, "nation")["covidData"]
 
 
 def update_covid_data() -> None:
+    global natoin_data
     """get_hospital_cases Function
 
     This function is used to update covid_data globally as a proxy for a scheduler.
@@ -188,6 +193,9 @@ def update_covid_data() -> None:
     """
     logging.info("Trying to update covid data!")
     covid_data = covid_API_request()["covidData"]
+
+    nation = json.loads(open("config.json").read())["nation"]
+    nation_data = covid_API_request(nation, "nation")["covidData"]
 # covid_API_request()
 
 

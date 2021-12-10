@@ -13,6 +13,7 @@ import json
 import datetime
 
 from schedHandler import schedHandler
+
 from covid_news_handling import *
 from covid_data_handler import *
 from flask import Flask, render_template, request , Markup
@@ -35,9 +36,11 @@ global updates
 global nation
 
 
+
 # Follow the google style doc strings
 
 nation = json.loads(open("config.json").read())["nation"]
+
 
 update_covid_data()
 update_news()
@@ -63,15 +66,17 @@ def index():
         A rendered template hosted at localhost:5002/index
 
     """
+
     logging.info("localhost:5000/index has been requested")
     newCases = 0
     for x in range(0, 7):
         newCases += covid_data[x]["newCasesByPublishDate"]
-
-    nation_data = covid_API_request(nation, "nation")["covidData"]
+    logging.info("new cases in location are : {}".format(newCases))
+    
     nationCases = 0
     for x in range(0, 7):
         nationCases += nation_data[x]["newCasesByPublishDate"]
+    logging.info("national cases are : {}".format(nationCases))
 
     # print(request.args)
     # http://127.0.0.1:5002/index?alarm=12%3A03&two=124&repeat=repeat&covid-data=covid-data&news=news

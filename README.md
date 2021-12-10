@@ -15,6 +15,7 @@ These are the requirements:
 + [python 3.9 +](www.python.org/downloads/release/python-399)
 + [uk-covid19](https://github.com/publichealthengland/coronavirus-dashboard-api-python-sdk)
 + [newsapi](https://newsapi.org/docs/client-libraries/python)
++ [flask](https://pypi.org/project/Flask/)
 
 ## Installation / Getting Started
 
